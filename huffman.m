@@ -39,19 +39,24 @@ while (size(p,1) > 1) % while there are at least 2 probs in the list
     % re-order the probabilities cum index by order of increasing probs
     p = p(ii,:); 
     
-    % Implement the following steps:
+    
     % 1) add a new "orphan" node to the end of the tree t (value 0)
-    % 2) make this new node the parent of the two nodes with the smallest
-    % probabilities (their indices being p(1,2) and p(2,2))
+    t(end+1) = 0;
+    new_length = length(t);
+    
+    % 2) make this new node the parent of the two nodes with the smallest    
+    % probabilities 
+    t(p(1, 2)) = new_length;
+    t(p(2, 2)) = new_length;
+    
     % 3) replace the two smallest nodes in the "p" matrix by their new
     % parent nodes: for example, keep the second row of p and replace its
     % first entry by the sum of the two previous smallest probabilities,
     % and its second entry by the index of the new node you have created in
     % the tree, and then remove row 1 of p.
-
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % PLEASE COMPLETE THIS PART OF THE FUNCTION. %
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    p(2, :) = [p(1, 1) + p(2, 1), new_length];
+    p = p(2 : end, :);
     
 end
 

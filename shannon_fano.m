@@ -10,7 +10,7 @@ function [c,cl] = shannon_fano(p)
 % FUNCTION AND COMPLETE IT.
 
 % check format and validity of input
-if (nargin ~= 1 | abs(sum(p)-1.0) > 1e-5 | ~isempty(find(p<0)))
+if (nargin ~= 1 || abs(sum(p)-1.0) > 1e-5 || any(p<0))
     error('Argument of shannon_fano must be a probability ditribution');
 end
 
@@ -48,56 +48,27 @@ function [c, cl] = sf(p)
 % Copyright Jossy 2016
 
 % compute the codeword lengths for the Shannon-Fano code
-% PLEASE COMPLETE
-cl = ceil(-log(p)/log(2));
-
-% You now have two options: either construct the extended tree with the
-% given codeword lengths from the root, or use Shannon's method
-% PLEASE DELETE THE OPTION YOU ARE NOT PURSUING.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% OPTION 1: CONSTRUCT TREE %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Hints: 
-% 1) start with a tree xt consisting only of a root (a column of 3 zeros)
-% 2) initialise a variable to hold the "current" node (initially 1), the
-% current tree depth (initially zero), and the next codeword that needs to
-% be assigned a leaf (initially 1)
-% 3) start an infinite loop (this will be broken once the last codeword is
-% assigned
-% 4) check if the current node has any unassigned (zero) children
-% 5) if not, move one level up the tree (don't forget to update the node
-% AND the tree depth) and use the command "continue" to return to the start
-% of the infinite loop
-% 6) pick the first unassigned child, create a new node at the end of the
-% tree and assign that node as a new child and the current node as its
-% parent, then move to the new node (not forgetting to update the depth)
-% 7) check if there is a need for a codeword whose length is the new depth
-% 8) if there is AND it is the LAST codeword that needed assigning, break
-% the infinite loop
-% 9) otherwise, if there is a need for a codeword at this depth, simply
-% crawl back up to the current node's parent. The node you've just left
-% will never be visited again and will hence become a leaf. Update the
-% codeword counter.
-% 10) convert from xt to a code table
-
-% COMPLETE STEPS 1 to 10 HERE
-% 
-% 
-% 
-%
-%
-%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% OPTION 2: SHANNON'S METHOD %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+cl = ceil(-log2(p));
 
 
 % 1) COMPUTE THE CUMULATIVE DISTRIBUTION f FROM p
+
+f = cumsum(vertcat(0, p));
+
+f = f(1:end-1);
+
 % 2) CONVERT THE CUMULATIVE PROBABILITIES TO BINARY 
-% 3) TRUNCATE RESULTING CODE TABLE TO LENGTH OF LONGEST CODEWORD
+
+max_codeword_length = max(cl);
+c = zeros(length(f), max_codeword_length);
+
+for i = 1:length(f)
+    initial_length = max_codeword_length + 1;
+    codeword = int8(dec2bin(round(f(i) * 2^initial_length), initial_length)) - '0';
+    codeword = codeword(1:cl(i));
+    c(i, :) = [codeword zeros(1, max_codeword_length - cl(i))];
+end
+
 
 % Note that steps 2 and 3 could in principle be done as one, but there is a
 % danger that the "round" operation may yield the wrong last digit. It is
@@ -105,9 +76,5 @@ cl = ceil(-log(p)/log(2));
 % length and then truncate the table to the maximum codeword length in a
 % separate step.
 
-% COMPLETE STEPS 1 to 3 HERE
-%
-%
-%
 
 return;
